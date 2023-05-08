@@ -1,0 +1,212 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  Project Sedum: CFN Template to create an IAM Role . 
+
+Metadata:
+  TemplateName: iam-role-stack.yaml
+  TemplateType: IAM Role
+  Version: 1.0.0
+  Owner: Subhamay Bhattacharyya
+  ProjectName: Sedum
+  Modification History:
+    - 1.0.0  - May 08, 2022   -- Initial Version 
+  StepsToTest: |
+    Manualy verify the Stack.
+  StepsToCleanup: |
+    Stack delete command
+
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    #################################### Project Name and Environment ##############################
+    - Label: 
+        default: "Project And Environment:"
+      Parameters: 
+        - ProjectName
+        - Environment
+    #################################### Lambda Function ###########################################
+    - Label:
+        default: "Lambda Function:"
+      Parameters:
+      - OpenCaseLambdaLambdaFunctionName
+      - AssignCaseLambdaLambdaFunctionName
+      - WorkOnCaseLambdaLambdaFunctionName
+      - EscalateCaseLambdaLambdaFunctionName
+      - CloseCaseLambdaLambdaFunctionName
+      - LambdaExecutionPolicyName
+    #################################### Lambda Function ###########################################
+    - Label: 
+        default: "Step Function:"
+      Parameters:
+      - StepFunctionExecutionRoleName
+    ParameterLabels:
+      ################################## Project Name and Environment ##############################
+      ProjectName:
+        default: "Project Name."
+      Environment:
+        default: "Environment Name."
+      ################################## Lambda Function ###########################################
+      OpenCaseLambdaLambdaFunctionName: 
+        default: "Open Case Lammba Function Name."
+      AssignCaseLambdaLambdaFunctionName: 
+        default: "Assign Case Lammba Function Name."
+      WorkOnCaseLambdaLambdaFunctionName:
+        default: "Work On Case Lammba Function Name."
+      EscalateCaseLambdaLambdaFunctionName:
+        default: "Escalate Case Lammba Function Name."
+      CloseCaseLambdaLambdaFunctionName:
+        default: "Close Case Lammba Function Name."
+      LambdaExecutionRoleName: 
+        default: "Lambda Function Execution Role Name."
+      LambdaExecutionPolicyName:
+        default: "Lambda Function Execution Policy Name."
+      ################################## Lambda Function ###########################################
+      StepFunctionExecutionRoleName:
+        default: "Step Function IAM Role Name."
+Parameters:
+  ###################################### Project Name and Environment ##############################
+  ProjectName:
+    Default: project
+    Description: "The Project Name."
+    Type: String
+    MinLength: 5
+    MaxLength: 30
+    AllowedPattern: "[a-z]*"
+    ConstraintDescription: "The length should be between 5 and 30, must contain only lowercase alphabets."
+  Environment:
+    Default: devl
+    Description: "The Environment Name."
+    Type: String
+    AllowedValues: ["devl", "test", "prod"]
+    ConstraintDescription: "The Environment must be devl / test or prod"
+  ##################################### Lambda Function ###########################################
+  OpenCaseLambdaLambdaFunctionName:
+    Default: some-lambda-function-name
+    Description: Processing Lambda Function Name
+    Type: String
+    MinLength: 20
+    MaxLength: 60
+    AllowedPattern: "[a-zA-Z0-9-]*"
+    ConstraintDescription: The length should be between 20 and 60, must contain only alphanumeric or dash.
+  AssignCaseLambdaLambdaFunctionName:
+    Default: some-lambda-function-name
+    Description: Processing Lambda Function Name
+    Type: String
+    MinLength: 20
+    MaxLength: 60
+    AllowedPattern: "[a-zA-Z0-9-]*"
+    ConstraintDescription: The length should be between 20 and 60, must contain only alphanumeric or dash.
+  WorkOnCaseLambdaLambdaFunctionName:
+    Default: some-lambda-function-name
+    Description: Processing Lambda Function Name
+    Type: String
+    MinLength: 10
+    MaxLength: 60
+    AllowedPattern: "[a-zA-Z0-9-]*"
+    ConstraintDescription: The length should be between 20 and 60, must contain only alphanumeric or dash.
+  EscalateCaseLambdaLambdaFunctionName:
+    Default: some-lambda-function-name
+    Description: Processing Lambda Function Name
+    Type: String
+    MinLength: 10
+    MaxLength: 60
+    AllowedPattern: "[a-zA-Z0-9-]*"
+    ConstraintDescription: The length should be between 20 and 60, must contain only alphanumeric or dash.
+  CloseCaseLambdaLambdaFunctionName:
+    Default: some-lambda-function-name
+    Description: Processing Lambda Function Name
+    Type: String
+    MinLength: 10
+    MaxLength: 60
+    AllowedPattern: "[a-zA-Z0-9-]*"
+    ConstraintDescription: The length should be between 20 and 60, must contain only alphanumeric or dash.
+  LambdaExecutionRoleName:
+    Default: lambda-function-role-name
+    Description: Lambda Function Execution Role Name
+    Type: String
+    MinLength: 10
+    MaxLength: 40
+    AllowedPattern: "[a-zA-Z0-9-]*"
+    ConstraintDescription: The length should be between 20 and 60, must contain only alphanumeric or dash.
+  LambdaExecutionPolicyName:
+    Default: lambda-function-policy-name
+    Description: Lambda Function Execution Policy Name
+    Type: String
+    MinLength: 10
+    MaxLength: 60
+    AllowedPattern: "[a-zA-Z0-9-]*"
+    ConstraintDescription: The length should be between 20 and 60, must contain only alphanumeric or dash.
+  ###################################### Step Function #############################################
+  StepFunctionExecutionRoleName:
+    Default: step-function-role-name
+    Description: Step Function Execution Role Name
+    Type: String
+    MinLength: 10
+    MaxLength: 60
+    AllowedPattern: "[a-zA-Z0-9-]*"
+    ConstraintDescription: The length should be between 20 and 60, must contain only alphanumeric or dash.
+Resources:
+  ###################################### Lambda Function Execution Role ############################
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref LambdaExecutionRoleName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Policies:
+        - PolicyName: !Ref LambdaExecutionPolicyName
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Sid: AllowCloudWatchLogStream
+              Effect: Allow
+              Action: 
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: 
+                - !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${OpenCaseLambdaLambdaFunctionName}-${Environment}-${AWS::Region}:*'
+                - !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AssignCaseLambdaLambdaFunctionName}-${Environment}-${AWS::Region}:*'
+                - !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${WorkOnCaseLambdaLambdaFunctionName}-${Environment}-${AWS::Region}:*'
+                - !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${EscalateCaseLambdaLambdaFunctionName}-${Environment}-${AWS::Region}:*'
+                - !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${CloseCaseLambdaLambdaFunctionName}-${Environment}-${AWS::Region}:*'
+      Tags: 
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironmentName
+          Value: !Ref Environment
+  ###################################### State Machine Execution Role #################################
+  StepFunctionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref StepFunctionExecutionRoleName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - states.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      ManagedPolicyArns: 
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaRole"
+      Tags:
+        - Key: ProjectName
+          Value: !Ref ProjectName
+        - Key: EnvironmentName
+          Value: !Ref Environment
+Outputs:
+  LambdaExecutionRoleArn:
+    Description: The Arn of the Lambda Execution Role
+    Value: !GetAtt LambdaExecutionRole.Arn
+  StepFunctionExecutionRoleArn:
+    Description: The Arn of the Step Function Execution Role
+    Value: !GetAtt StepFunctionExecutionRole.Arn
+
